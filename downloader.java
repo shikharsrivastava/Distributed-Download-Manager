@@ -5,7 +5,15 @@ import java.lang.*;
 import java.net.*;
 import java.io.*;
 
+/*
+	The thread which is responsible for downloading
+	a file from an offset and writing it to file
 
+	Constructor Param -
+	fileName - Name of the file stored in HDD
+	pos - Offset from which the file downloads and is written
+	uc - URL connection Object to set up connection
+*/
 class Th implements Runnable {
 
 	final int CHUNK = 401816;
@@ -52,6 +60,10 @@ class Th implements Runnable {
 	
 }
 
+/*
+	The Downloader class which makes
+*/
+
 class Downloader {
 
 	public static void main(String args[]) throws Exception {
@@ -78,4 +90,3 @@ class Downloader {
 			tarr[i].t.join();
 
 	}
-}
