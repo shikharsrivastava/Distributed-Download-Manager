@@ -3,20 +3,24 @@ import java.lang.*;
 import java.net.*;
 import java.io.*;
 
+/*
+	Class to register the new connection and share data for
+	segmented download
+*/
 
 class Register implements Runnable {
 
 	Thread t;
 	private Socket s;
-	public ListeningThread(Socket s) {
+	public Register(Socket s) {
 		t = new Thread(this);
 		this.s = s;
 		t.start();
 	}
 
 	public void run() {
-		System.out.println(s);
-		return;
+		System.out.println("Listening on Socket " + s);
+		
 	}
 }
 
