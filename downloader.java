@@ -14,14 +14,14 @@ import java.io.*;
 	pos - Offset from which the file downloads and is written
 	uc - URL connection Object to set up connection
 */
-class Th implements Runnable {
+class Downloader implements Runnable {
 
 	final int CHUNK = 401816;
 	Thread t;
 	String fileName;
 	int pos;
 	URLConnection uc;
-	public Th(String fileName,int pos,URLConnection uc) {
+	public Downloader(String fileName,int pos,URLConnection uc) {
 		this.t = new Thread(this);
 		this.fileName =  fileName;
 		this.pos = pos;
@@ -64,7 +64,7 @@ class Th implements Runnable {
 	The Downloader class which makes
 */
 
-class Downloader {
+class App {
 
 	public static void main(String args[]) throws Exception {
 
@@ -77,11 +77,11 @@ class Downloader {
 		
 		final long size = connection.getContentLength();
 		System.out.println(size);
-		Th tarr[] = new Th[1000];
+		Downloader tarr[] = new Downloader[1000];
 		int ind = 0, pos = 0;
 		 while(pos < size)
 		{
-			Th t = new Th(fileName,pos,url.openConnection());
+			Downloader t = new Downloader(fileName,pos,url.openConnection());
 			tarr[ind++] = t;
 			pos += CHUNK;
 		}
@@ -90,3 +90,4 @@ class Downloader {
 			tarr[i].t.join();
 
 	}
+}
