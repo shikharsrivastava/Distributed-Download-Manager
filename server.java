@@ -21,8 +21,18 @@ class Register implements Runnable {
 	public void run() {
 		System.out.println("Listening on Socket " + s);
 		
-		/*Getting the URL*/
-		
+		/*
+			Furthur steps
+				Get the URL and offset
+				Try to connect to the url
+				if cannot connect
+					return true to Peer
+				else
+					return true to Peer
+					Transfer Job to Relayer object
+					The relayer object relays the information concurrently
+		*/
+
 	}
 }
 
