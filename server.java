@@ -21,6 +21,8 @@ class Register implements Runnable {
 	public void run() {
 		System.out.println("Listening on Socket " + s);
 		
+		/*Getting the URL*/
+		
 	}
 }
 
