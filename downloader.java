@@ -4,6 +4,7 @@ import java.util.*;
 import java.lang.*;
 import java.net.*;
 import java.io.*;
+import INTF.Client;
 
 /*
 	The thread which is responsible for downloading
@@ -16,25 +17,26 @@ import java.io.*;
 */
 class Downloader implements Runnable {
 
-	final int CHUNK = 401816;
 	Thread t;
 	String fileName;
-	int pos;
+	int offset,CHUNK;
 	URLConnection uc;
-	public Downloader(String fileName,int pos,URLConnection uc) {
+	public Downloader(String fileName,int offset,int CHUNK,URLConnection uc) {
 		this.t = new Thread(this);
 		this.fileName =  fileName;
-		this.pos = pos;
+		this.offset = offset;
 		this.uc = uc;
+		this.CHUNK = CHUNK;
 		this.t.start();
 	}
 
 	public void run() {
 
 		try (RandomAccessFile f = new RandomAccessFile(fileName,"rw")) {
-			uc.setRequestProperty("Range","bytes=" + pos + "-");
-			System.out.println("pos = " + pos);
-			f.seek(pos);
+			uc.setRequestProperty("Range","bytes=" + offset + "-");
+			System.out.println("offset = " + offset);
+			/*Seeking to that position in the file*/
+			f.seek(offset);
 			
 			InputStream is = uc.getInputStream();
 			//BufferedInputStream is = new BufferedInputStream(inp,CHUNK);
@@ -42,11 +44,11 @@ class Downloader implements Runnable {
 			byte buff[] = new byte[CHUNK];
 			int rd,dwn = 0;
 			do {
-			rd = is.read(buff,ind,left);
-			if(rd != -1 && left > 0){
-			dwn += rd;
-			ind += rd;
-			left -= rd;
+				rd = is.read(buff,ind,left);
+				if(rd != -1 && left > 0){
+				dwn += rd;
+				ind += rd;
+				left -= rd;
 			}
 			}
 			while(rd != -1 && left > 0);
@@ -60,34 +62,93 @@ class Downloader implements Runnable {
 	
 }
 
-/*
-	The Downloader class which makes
-*/
 
-class App {
+class ClientA implements Runnable,Client {
+	Thread t;
+	final int TCOUNT = 4;
+	URL url;
+	int size;
+	String fileName;	
+	public ClientA(String url) {
+		t = new Thread(this);
+		try {
+			this.url = new URL(url);
+			URLConnection connection = this.url.openConnection();
+			this.size = connection.getContentLength();
+			this.fileName = getFileName(url);
+			t.start();
+		}
+		catch(MalformedURLException e) {
+			System.out.println("URL is malformed");
+		}
+		catch(IOException e) {
+			System.out.println("cannot open connection or connect");
+		}
+	}
 
-	public static void main(String args[]) throws Exception {
+	public boolean checkPeers() {
 
-		final int CHUNK = 401816;
-		URL url = new URL(args[0]);
-		final String fileName = "Syllabus.pdf";
+		System.out.println("Checking peer availability");
+		return false;
+	}
 
-		
-		URLConnection connection = url.openConnection();
-		
-		final long size = connection.getContentLength();
-		System.out.println(size);
-		Downloader tarr[] = new Downloader[1000];
-		int ind = 0, pos = 0;
-		 while(pos < size)
-		{
-			Downloader t = new Downloader(fileName,pos,url.openConnection());
-			tarr[ind++] = t;
-			pos += CHUNK;
+
+	public void run() {
+	/*
+		Set up all the parameters
+			Check for avilable peers
+				Contact the peers with file in new object (PeerHandler) for each peer
+				Manage all file parts that are successfully downloaded
+				For broken files manage download those broken parts in other object (ManageBroken)
+			If No peer, Download as it is in Download function
+	*/	
+
+		if(!checkPeers()){
+			download();
+			return;
+		}
+
+	}
+
+
+
+	public void download() {
+
+		System.out.println("Opening Connection and begining download");
+		Downloader d[] = new Downloader[TCOUNT];
+		int chunkSize = this.size/TCOUNT + 1;
+		int offset = 0,ind = 0;
+		/*
+			Downloading the file parallely on local machine
+			on TCOUNT number of threads
+		*/
+		while(offset < size) {
+			try {
+			d[ind++] = new Downloader(this.fileName,offset,chunkSize,this.url.openConnection());
+			offset += chunkSize;
+			}
+			catch(Exception e) {
+				System.out.println(e);
+			}
+		}
+		/* Waiting for downloading threads to finish*/
+		try {
+			
+			for(int i=0;i<ind;i++)
+				d[i].t.join();	
+		}
+		catch (InterruptedException e) {
+			System.out.println(e);
 		}
 		
-		for(int i=0;i<ind;i++)
-			tarr[i].t.join();
+	}
+	public void getStatus(){
+		System.out.println("status");		
+	}
+
+	public String getFileName(String url) {
+		System.out.println("get name");
+		return new String("newfile");
 
 	}
 }
