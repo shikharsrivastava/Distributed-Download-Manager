@@ -97,9 +97,10 @@ class ClientA implements Runnable,Client {
 	/*
 		Set up all the parameters
 			Check for avilable peers
-				Contact the peers with file in new object (PeerHandler) for each peer
-				Manage all file parts that are successfully downloaded
-				For broken files manage download those broken parts in other object (ManageBroken)
+				Dispatch the files using (Dispatcher) object
+				Contact the peers with file in new object (Assembler) object for each peer
+				Manage all file parts that are successfully downloaded in assembler
+				For broken files manage downloading those broken parts in other object (ManageBroken)
 			If No peer, Download as it is in Download function
 	*/	
 
