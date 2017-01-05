@@ -66,18 +66,29 @@ class Downloader implements Runnable {
 class ClientA implements Runnable,Client {
 	Thread t;
 	final int TCOUNT = 4;
+	final int TRACKER_PORT = 5000;
+	final String TRACKER_IP = "127.0.0.1";
+	Socket tracker;
 	URL url;
 	int size;
-	String fileName;	
+	String fileName;
+	BufferedReader is;
+	PrintWriter os;
+	HashSet<String> ipList;
 	public ClientA(String url) {
 		t = new Thread(this);
 		try {
-			this.url = new URL(url);
+			tracker = new Socket(TRACKER_IP,TRACKER_PORT);
+			is = new BufferedReader(new InputStreamReader(tracker.getInputStream()));
+			os = new PrintWriter(tracker.getOutputStream(),true);
+			ipList = new HashSet<String>();
+			/*this.url = new URL(url);
 			URLConnection connection = this.url.openConnection();
-			this.size = connection.getContentLength();
-			this.fileName = getFileName(url);
+			size = connection.getContentLength();
+			fileName = getFileName(url);*/
 			t.start();
 		}
+
 		catch(MalformedURLException e) {
 			System.out.println("URL is malformed");
 		}
@@ -89,11 +100,34 @@ class ClientA implements Runnable,Client {
 	public boolean checkPeers() {
 
 		System.out.println("Checking peer availability");
+		System.out.println("Connectef to "+tracker);
+		try {
+
+			while(true) {
+				String ip = is.readLine();
+				if(ip == ".") break;
+				else if(!ipList.contains(ip))
+					ipList.add(ip);
+			}
+		}
+		catch (Exception e){
+			System.out.println(e);
+		}
+		finally {
+		if(ipList.size() > 0) return true;
 		return false;
+		}
+	}
+
+	public void disconnect() {
+		os.println("delete");
+		os.println("disconnect");
 	}
 
 
 	public void run() {
+
+
 	/*
 		Set up all the parameters
 			Check for avilable peers
@@ -103,9 +137,11 @@ class ClientA implements Runnable,Client {
 				For broken files manage downloading those broken parts in other object (ManageBroken)
 			If No peer, Download as it is in Download function
 	*/	
+			
 
 		if(!checkPeers()){
-			download();
+			//download();
+			disconnect();
 			return;
 		}
 
