@@ -4,6 +4,11 @@ import java.io.*;
 import java.lang.*;
 import java.net.*;
 
+
+/*
+	This object Handles the Download for
+	connected peer and diverts the traffic
+*/
 class PeerHandler implements Runnable {
 
 	Thread t;
@@ -92,15 +97,23 @@ class PeerHandler implements Runnable {
 		}
 	}
 }
+/*
+	This object runs the Main server to
+	provide resource sharing to peers
+*/
 
 class Server implements Runnable{
-
+	// The port on which service runs
 	final int PEER_SERVER_PORT = 6000;
+	// Tracker port
 	final int TRACKER_PORT = 5000;
+	// Tracker IP address
 	final String TRACKER_IP = "127.0.0.1";
 	ServerSocket s;
 	Socket tracker;
+	// Stream for Tracker input
 	BufferedReader is;
+	// Stream for Tracket output
 	PrintWriter os;
 	Thread t;
 	public Server(){
