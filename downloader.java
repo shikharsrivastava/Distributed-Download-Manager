@@ -4,7 +4,7 @@ import java.util.*;
 import java.lang.*;
 import java.net.*;
 import java.io.*;
-import INTF.Client;
+import INTF.*;
 
 /*
 	The thread which is responsible for downloading
@@ -68,6 +68,7 @@ class ClientA implements Runnable,Client {
 	final int TCOUNT = 4;
 	final int TRACKER_PORT = 5000;
 	final String TRACKER_IP = "127.0.0.1";
+	final int NODE_CHUNK = 1000000;
 	Socket tracker;
 	URL url;
 	int size;
@@ -78,34 +79,38 @@ class ClientA implements Runnable,Client {
 	public ClientA(String url) {
 		t = new Thread(this);
 		try {
+			System.out.println("Constructor");
 			tracker = new Socket(TRACKER_IP,TRACKER_PORT);
 			is = new BufferedReader(new InputStreamReader(tracker.getInputStream()));
 			os = new PrintWriter(tracker.getOutputStream(),true);
 			ipList = new HashSet<String>();
-			/*this.url = new URL(url);
+			this.url = new URL(url);
 			URLConnection connection = this.url.openConnection();
 			size = connection.getContentLength();
-			fileName = getFileName(url);*/
+			System.out.println("Sizeof file = "+ size);
+			fileName = getFileName(url);
 			t.start();
 		}
 
 		catch(MalformedURLException e) {
-			System.out.println("URL is malformed");
+			System.out.println(e);
 		}
-		catch(IOException e) {
-			System.out.println("cannot open connection or connect");
+		catch(IOException ex) {
+			System.out.println(ex);
 		}
 	}
 
 	public boolean checkPeers() {
 
 		System.out.println("Checking peer availability");
-		System.out.println("Connectef to "+tracker);
+		System.out.println("Connected to "+tracker);
 		try {
-
+			/*Requesting the clients*/
+			os.println("refresh");
 			while(true) {
 				String ip = is.readLine();
-				if(ip == ".") break;
+				System.out.println("read "+ip);
+				if(ip.equals(".")) break;
 				else if(!ipList.contains(ip))
 					ipList.add(ip);
 			}
@@ -114,7 +119,8 @@ class ClientA implements Runnable,Client {
 			System.out.println(e);
 		}
 		finally {
-		if(ipList.size() > 0) return true;
+			System.out.println("iplist size = " + ipList.size());
+		if(ipList.size() > 0) return true; // Should be greater than 1
 		return false;
 		}
 	}
@@ -137,12 +143,26 @@ class ClientA implements Runnable,Client {
 				For broken files manage downloading those broken parts in other object (ManageBroken)
 			If No peer, Download as it is in Download function
 	*/	
-			
-
-		if(!checkPeers()){
+		System.out.println("Running in thread");	
+		try {
+			if(!checkPeers()){
 			//download();
+			System.out.println("No peer found");
 			disconnect();
 			return;
+			}	
+
+			Dispatch dId = new Dispatch(ipList,url,size,fileName);
+			dId.Distribute();
+			System.out.println("Distributed");
+		}
+		finally {
+			try {
+				tracker.close();
+			}
+			catch(IOException e) {
+				System.out.println(e);
+			}
 		}
 
 	}
