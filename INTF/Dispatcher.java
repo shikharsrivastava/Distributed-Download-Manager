@@ -9,6 +9,5 @@ package INTF;
 */
 public interface Dispatcher {
 
-	String[] getHostList();
 	boolean Distribute();
 }
