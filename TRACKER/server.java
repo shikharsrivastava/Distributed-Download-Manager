@@ -6,6 +6,9 @@ import java.io.*;
 	The tracker object is a shared object 
 	responsible for saving information of
 	peers providing downloading service
+
+	Todo -
+		Efficent Load Balancing
 */
 
 
