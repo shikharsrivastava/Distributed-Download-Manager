@@ -2,19 +2,26 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-class Tracker {
+/*
+	The tracker object is a shared object 
+	responsible for saving information of
+	peers providing downloading service
+*/
 
+
+class Tracker {
+	// Set of online peers
 	HashSet<String> ipList;
 	public Tracker() {
 		ipList = new HashSet<String>();
 	}
-
+	// Adds ip to the set of peers
 	synchronized public void add(String ip) {
 
 		System.out.println("Adding " + ip);
 		ipList.add(ip);
 	}
-
+	// Feeds information of online peers to os (stream)
 	synchronized public void refresh(PrintWriter os) {
 
 		for(String s: ipList) {
@@ -25,20 +32,30 @@ class Tracker {
 
 		os.println(".");
 	}
-
+	// Deletes the ip from the set of online peers
 	synchronized public void delete(String ip) {
 		if(ipList.contains(ip))
 			ipList.remove(ip);
 	}
 }
 
+/*
+	This object handles the connection 
+	with a connection a peer server or 
+	peer client
+*/
+
 class Handler implements Runnable{
 
 	Thread t;
 	Socket s;
+	// Stream for socket input
 	BufferedReader is;
+	// Stream for socket output
 	PrintWriter os;
+	// Tracker object storing information
 	Tracker tracker;
+	// Ip address of connected peer
 	String clientIp;
 
 	public Handler(Socket s,Tracker tracker) {
@@ -62,7 +79,7 @@ class Handler implements Runnable{
 
 	public void run() {
 
-		// Accepting requests and replying
+		// Accepting requests and preforming actions
 		try {
 
 		while(!s.isInputShutdown()) {
@@ -72,9 +89,13 @@ class Handler implements Runnable{
 				Multiplex according to the request;
 			*/
 			System.out.println("request == " + request);
+			/*Identifying the peer as server or client*/
 			if(request.equals("Server")) tracker.add(clientIp);
+			/*Request to get the list o peers*/
 			else if(request.equals("refresh")) tracker.refresh(os);
+			/*Requst to disconnect this peer*/
 			else if(request.equals("disconnect")) break;
+
 			else throw new Exception("Undefined request made");
 		}
 
@@ -101,7 +122,10 @@ class Handler implements Runnable{
 
 }
 
-
+/*
+	Main Server class that manages
+	the tracker server
+*/
 
 class Server {
 
@@ -113,16 +137,13 @@ class Server {
 
 		/*
 			Accepting connection to take info
-				Connect with every new user and save its information in a global object (Registration)
-				Make seperate thread for each client
+				Connecting with every new user and saving its information in a shared object (Tracker)
 				Handle and exchange messages for success or faliure
-
-				Timely ping the all clients to check if someone has died
-				Make a Request object to manage a any sort of request from the corresponding client (Online User List, check if die loist,etc)
-								
+				
+				Timely ping the all clients to check if someone has died and refresh								
 		*/
 
-		/**/
+		
 		Tracker t = new Tracker();
 		while(true) {
 			Socket cl = s.accept();
@@ -134,6 +155,13 @@ class Server {
 	catch(Exception e) {
 		System.out.println("Unable to open socket");
 	}
+
+	}
+	/*
+		Function to timely update the 
+		list of	online peers 
+	*/
+	public void update(){
 
 	}
 }
