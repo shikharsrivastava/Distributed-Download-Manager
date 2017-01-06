@@ -1,4 +1,3 @@
-//23:29
 
 import java.util.*;
 import java.lang.*;
@@ -9,11 +8,6 @@ import INTF.*;
 /*
 	The thread which is responsible for downloading
 	a file from an offset and writing it to file
-
-	Constructor Param -
-	fileName - Name of the file stored in HDD
-	pos - Offset from which the file downloads and is written
-	uc - URL connection Object to set up connection
 */
 class Downloader implements Runnable {
 
@@ -21,6 +15,13 @@ class Downloader implements Runnable {
 	String fileName;
 	int offset,CHUNK;
 	URLConnection uc;
+	/*
+		Param -
+		fileName - Name of the file stored in HDD
+		pos - Offset from which the file downloads and is written
+		CHUNK - Chunk size of each Download
+		uc - URL connection Object to set up connection
+	*/
 	public Downloader(String fileName,int offset,int CHUNK,URLConnection uc) {
 		this.t = new Thread(this);
 		this.fileName =  fileName;
@@ -62,7 +63,10 @@ class Downloader implements Runnable {
 	
 }
 
-
+/*
+	The Client thread which manages the
+	Download of a particular file
+*/
 class ClientA implements Runnable,Client {
 	Thread t;
 	final int TCOUNT = 4;
@@ -99,7 +103,10 @@ class ClientA implements Runnable,Client {
 			System.out.println(ex);
 		}
 	}
-
+	/*
+		The function gets the list of
+		Online peers from the Tracker
+	*/
 	public boolean checkPeers() {
 
 		System.out.println("Checking peer availability");
@@ -124,12 +131,11 @@ class ClientA implements Runnable,Client {
 		return false;
 		}
 	}
-
+	// Disconnect this machine from Tracker
 	public void disconnect() {
 		os.println("delete");
 		os.println("disconnect");
 	}
-
 
 	public void run() {
 
@@ -137,19 +143,19 @@ class ClientA implements Runnable,Client {
 	/*
 		Set up all the parameters
 			Check for avilable peers
-				Dispatch the files using (Dispatcher) object
-				Contact the peers with file in new object (Assembler) object for each peer
-				Manage all file parts that are successfully downloaded in assembler
+				Dispatch the files using (Dispatch) object
+				Contact the peers with file in new object (Handler) object for each peer
+				Manage all file parts that are successfully downloaded in Handler
 				For broken files manage downloading those broken parts in other object (ManageBroken)
 			If No peer, Download as it is in Download function
 	*/	
 		System.out.println("Running in thread");	
 		try {
 			if(!checkPeers()){
-			//download();
-			System.out.println("No peer found");
-			disconnect();
-			return;
+				System.out.println("No peer found, Downloading on local machine");
+				download();
+				disconnect();
+				return;
 			}	
 
 			Dispatch dId = new Dispatch(ipList,url,size,fileName);
@@ -168,7 +174,10 @@ class ClientA implements Runnable,Client {
 	}
 
 
-
+	/*
+		The function downloads the file
+		on local machine
+	*/
 	public void download() {
 
 		System.out.println("Opening Connection and begining download");
@@ -199,10 +208,15 @@ class ClientA implements Runnable,Client {
 		}
 		
 	}
+	/*
+		ToDo :)
+	*/
 	public void getStatus(){
 		System.out.println("status");		
 	}
-
+	/*
+		ToDo :)
+	*/
 	public String getFileName(String url) {
 		System.out.println("get name");
 		return new String("newfile");
