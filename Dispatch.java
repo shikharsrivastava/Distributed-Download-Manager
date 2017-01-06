@@ -3,18 +3,30 @@ import java.util.*;
 import java.io.*;
 import INTF.*;
 
-
+/*
+	This Object manages the connection with a
+	peer and gets the downloaded file from it
+*/
 class HandlePeer implements Runnable {
+	// The port on which service is running on peer
 	final int DISPATCH_PORT = 6000;
+	// Ip address of peer
 	String ip;
+	// Url for download
 	URL url;
+	// Name of file to download
 	String fileName;
+	// Offset and size managed by this object
 	int offset,size,totalRead;
 	Thread t;
 	Socket s;
+	// File for writing
 	RandomAccessFile f;
+	// Stream for socket input
 	BufferedInputStream is;
+	// Status flag of peer
 	boolean success;
+	// Stream for socket output
 	PrintWriter os;
 	public HandlePeer(String ip,URL url,String fileName,int offset,int size) {
 		this.t = new Thread(this);
@@ -91,12 +103,21 @@ class HandlePeer implements Runnable {
 	}
 }
 
-class Dispatch implements Dispatcher {
+/*
+	This object is responsible for dispatching
+	the file on suitable peers in network
+*/
 
+class Dispatch implements Dispatcher {
+	// The maximum number of nodes on which it can dispatch
 	final int MAX_DISPATCH = 10;
+	// Url of download
 	URL url;
-	int size,NODE_CHUNK;
+	// Size of file
+	int size;
+	// Filename
 	String fileName;
+	// Set of online peers
 	HashSet<String> ipList;
 	public Dispatch(HashSet<String> ipList,URL url,int size,String fileName) {
 		System.out.println("In Dispatch constructor");
@@ -105,7 +126,14 @@ class Dispatch implements Dispatcher {
 		this.size = size;
 		this.fileName = fileName;
 	}
+	/*
+		This function Distribute the file 
+		across online peers
 
+		Todo -
+			Make the system more Fault Tolerent
+			Manage Load Balancing
+	*/
 	public boolean Distribute() {
 		System.out.println("Distributing");
 
@@ -114,6 +142,7 @@ class Dispatch implements Dispatcher {
 		int chunk = (size / ipList.size()) + 1;
 		System.out.println("size = " + size + " offset = "+ offset + " chunk = " + chunk);
 		HandlePeer peers[] = new HandlePeer[MAX_DISPATCH];
+
 		for (String ip: ipList) {
 			System.out.println("Dispatching to " + ip + " offset = "+offset);
 			if(size - offset < chunk){
