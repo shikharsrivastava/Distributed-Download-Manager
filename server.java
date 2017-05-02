@@ -104,7 +104,7 @@ class PeerHandler implements Runnable {
 
 class Server implements Runnable{
 	// The port on which service runs
-	final int PEER_SERVER_PORT = 6000;
+	final int PEER_SERVER_PORT = 6010;
 	// Tracker port
 	final int TRACKER_PORT = 5000;
 	// Tracker IP address
