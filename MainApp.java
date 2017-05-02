@@ -15,9 +15,14 @@ class MainApp {
 
 	public static void main(String args[]) throws Exception {
 	
-		/*Starting Peer Server*/
+		/*Starting Peer Server for all other clients*/
 		Server s = new Server();
-		ClientA cl = new ClientA("http://www.nith.ac.in/ece/syll_2015.pdf");
+
+		/*Now asking users for download links*/
+		System.out.println("Enter the download link");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String link = br.readLine();
+		ClientA cl = new ClientA(link);
 		s.t.join();
 		cl.t.join();
 	}
