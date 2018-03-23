@@ -10,3 +10,4 @@ __It is strongly advised not to run this on just a single machine__
 4. Enter the download link in the terminal
 5. If some other peers are present, the download gets distributed on them otherwise it is downloaded fully by the app itself.
 6. Close the app after one download.
+7. Each App instance has a server running on the machine that handles download for other clients and a client that manages download for this machine.
