@@ -127,7 +127,7 @@ class ClientA implements Runnable,Client {
 		}
 		finally {
 			System.out.println("iplist size = " + ipList.size());
-		if(ipList.size() > 0) return true; // Should be greater than 1
+		if(ipList.size() > 1) return true; // Should be greater than 1
 		return false;
 		}
 	}
