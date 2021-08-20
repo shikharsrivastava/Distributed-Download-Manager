@@ -50,6 +50,11 @@ class PeerHandler implements Runnable {
 			offset = Integer.parseInt(is.readLine());
 			size = Integer.parseInt(is.readLine());
 
+			System.out.println("downloading from");
+			System.out.println(url);
+			System.out.println(offset);
+			System.out.println(size);
+
 			/*Starting download*/
 			URL u = new URL(url);
 			URLConnection uc = u.openConnection();
@@ -62,21 +67,23 @@ class PeerHandler implements Runnable {
 			int left = size,rd = 0;
 			do {
 				if(left <= buffSize) {
-					System.out.println("Downloading " + left +" bytes in 1st");
+					//System.out.println("Downloading " + left +" bytes in 1st");
 					rd = dis.read(buff,0,left);
 				}
 				else {
-					System.out.println("Downloading " + buffSize+ " bytes in 2nd");
+					//System.out.println("Downloading " + buffSize+ " bytes in 2nd");
 					rd = dis.read(buff,0,buffSize);
 				}
 				if(rd != -1) {
-					System.out.println("Downloaded " + rd + " bytes");
+					//System.out.println("Downloaded " + rd + " bytes");
 					os.write(buff,0,rd);
 					os.flush();
 					totalRead += rd;
+					left -= rd;
 				}
+				System.out.printf("size: %d totalRead:%d\n", size, totalRead);
 			}
-			while(rd != -1);
+			while(!(left == 0 || rd == -1));
 
 			if(totalRead == size)
 				success = true;
@@ -108,7 +115,7 @@ class Server implements Runnable{
 	// Tracker port
 	final int TRACKER_PORT = 8000;
 	// Tracker IP address
-	final String TRACKER_IP = "127.0.0.1";
+	final String TRACKER_IP = "192.168.1.31";
 	ServerSocket s;
 	Socket tracker;
 	// Stream for Tracker input
@@ -136,7 +143,9 @@ class Server implements Runnable{
 		System.out.println("The peer server is running on port "+ PEER_SERVER_PORT);
 		while(true) {
 			try {
+				System.out.println("Waiting to accept");
 				Socket cl = s.accept();
+				System.out.println("got a peer");
 				new PeerHandler(cl);	
 			}
 			catch (IOException e) {

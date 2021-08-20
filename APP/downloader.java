@@ -71,7 +71,7 @@ class ClientA implements Runnable,Client {
 	Thread t;
 	final int TCOUNT = 4;
 	final int TRACKER_PORT = 8000;
-	final String TRACKER_IP = "127.0.0.1";
+	final String TRACKER_IP = "192.168.1.31";
 	final int NODE_CHUNK = 1000000;
 	Socket tracker;
 	URL url;
