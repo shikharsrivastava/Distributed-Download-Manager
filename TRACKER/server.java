@@ -132,7 +132,7 @@ class Handler implements Runnable{
 
 class Server {
 
-	final static int TRACKER_PORT = 5000;
+	final static int TRACKER_PORT = 8000;
 	public static void main(String args[]) {
 
 		try (ServerSocket s = new ServerSocket(TRACKER_PORT)) {

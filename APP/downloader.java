@@ -64,13 +64,13 @@ class Downloader implements Runnable {
 }
 
 /*
-	The Client thread which manages the
+	The is Client thread which manages the
 	Download of a particular file
 */
 class ClientA implements Runnable,Client {
 	Thread t;
 	final int TCOUNT = 4;
-	final int TRACKER_PORT = 5000;
+	final int TRACKER_PORT = 8000;
 	final String TRACKER_IP = "127.0.0.1";
 	final int NODE_CHUNK = 1000000;
 	Socket tracker;
@@ -83,7 +83,6 @@ class ClientA implements Runnable,Client {
 	public ClientA(String url) {
 		t = new Thread(this);
 		try {
-			System.out.println("Constructor");
 			tracker = new Socket(TRACKER_IP,TRACKER_PORT);
 			is = new BufferedReader(new InputStreamReader(tracker.getInputStream()));
 			os = new PrintWriter(tracker.getOutputStream(),true);

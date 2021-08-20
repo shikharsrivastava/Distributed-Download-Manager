@@ -9,7 +9,7 @@ import INTF.*;
 */
 class HandlePeer implements Runnable {
 	// The port on which service is running on peer
-	final int DISPATCH_PORT = 6000;
+	final int DISPATCH_PORT = 8001;
 	// Ip address of peer
 	String ip;
 	// Url for download
